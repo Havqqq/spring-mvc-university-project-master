@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        function sliderChange(value, id) {
+            document.getElementById('slider' + id).innerHTML = value;
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="header">
+    <div class="container">
+        <a class="navbar-brand" href="#">Kierunki PRZ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+                aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" th:href="@{/}">Lista kierunków <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <div sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/user/home}">Twoja lista</a>
+                    </div>
+                </li>
+            </ul>
+            <div sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="btn btn-outline-success" role="button" aria-pressed="true">Logowanie</a>
+                <a th:href="@{/registration}" class="ml-1 btn btn-outline-info" role="button" aria-pressed="true">Rejestracja</a>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <a th:href="@{/logout}" class="btn btn-outline-danger" role="button" aria-pressed="true">Wyloguj</a>
+            </div>
+            <div sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/home}" class="ml-1 btn btn-danger" role="button" aria-pressed="true">Admin
+                    Panel</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-8">
+                <h2>Zarządzaj wydziałami i kierunkami</h2>
+            </div>
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-sm" sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/userList}" class="btn btn-primary btn-lg btn-block" role="button"
+                           aria-pressed="true">Użytkownicy</a>
+                    </div>
+                    <div class="col-sm" sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/adminList}" class="btn btn-primary btn-lg btn-block" role="button"
+                           aria-pressed="true">Administratorzy</a>
+                    </div>
+                    <div class="col-sm" sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/facultiesSpecializationsList}" class="btn btn-primary btn-lg btn-block"
+                           role="button" aria-pressed="true">Wydziały i kierunki</a>
+                    </div>
+                </div>
+            </div>
+
+            <!--FACULTIES-->
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Adres</th>
+                    <th scope="col">Strona</th>
+                    <th scope="col">Logo</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="currentFaculty : ${faculties}">
+                    <th scope="row" th:text="${currentFaculty.id}"></th>
+                    <td th:text="${currentFaculty.name}"></td>
+                    <td th:text="${currentFaculty.address}"></td>
+                    <td th:text="${currentFaculty.website}"></td>
+                    <td th:text="${currentFaculty.logo}"></td>
+
+                    <td>
+                        <a th:href="@{/admin/facultiesSpecializationsEdit}" class="btn btn-danger"
+                           role="button" aria-pressed="true">Edytuj</a>
+                    </td>
+
+
+                </tr>
+                    <a th:href="@{/admin/facultiesAdd}" class="btn btn-lg btn-success btn-block"
+                   role="button" aria-pressed="true">Dodaj Wydział</a>
+                </tbody>
+            </table>
+
+            <!--SPECIALIZATIONS-->
+            <table class="table table-sm">
+                <tbody>
+                <tr>
+                    <th scope="col">ID kierunku</th>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Opis</th>
+                    <th scope="col">ID wydziału</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+
+                <tr th:each="currentSpecialization : ${specializations}">
+                    <th scope="row" th:text="${currentSpecialization.id}"></th>
+                    <td th:text="${currentSpecialization.name}"></td>
+                    <td th:text="${currentSpecialization.description}"></td>
+                    <td th:text="${currentSpecialization.faculty.id}"></td>
+                    <td>
+                    </td>
+                </tr>
+                    <a th:href="@{/admin/facultiesSpecializationsEdit}" class="btn btn-lg btn-danger btn-block"
+                   role="button" aria-pressed="true">Edytuj</a>
+                <a th:href="@{/admin/facultiesSpecializationsAdd}" class="btn btn-lg btn-success btn-block"
+                   role="button" aria-pressed="true">Dodaj Kierunek</a>
+                </tbody>
+            </table>
+        </div>
+        </div>
+</div>
+</body>
+</html>

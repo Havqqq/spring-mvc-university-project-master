@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home.css}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="header">
+    <div class="container">
+        <a class="navbar-brand" href="#">Kierunki PRZ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" th:href="@{/}">Lista kierunków <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <div sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/user/home}">Twoja lista</a>
+                    </div>
+                </li>
+            </ul>
+            <div sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="btn btn-outline-success" role="button" aria-pressed="true">Logowanie</a>
+                <a th:href="@{/registration}" class="ml-1 btn btn-outline-info" role="button" aria-pressed="true">Rejestracja</a>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <a th:href="@{/logout}" class="btn btn-outline-danger" role="button" aria-pressed="true">Wyloguj</a>
+            </div>
+            <div sec:authorize="hasAuthority('ADMIN')">
+                <a th:href="@{/admin/home}" class="ml-1 btn btn-danger" role="button" aria-pressed="true">Admin Panel</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+
+
+
+            <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${not user.didSurvey()}">
+                <p>
+                    <strong>Nie uzupełniłeś jeszcze ankiety! </strong> Po uzupełnieniu ankiety wyświetlimy Ci listę kierunków na które się nadajesz!
+                </p>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <a class="btn btn-outline-success btn-lg" th:href="@{/user/survey}" role="button">Rozpocznij ankietę</a>
+            </div>
+
+            <div th:if="${user.didSurvey()}">
+                <h2>Kierunki wybrane dla Ciebie</h2>
+                <p>Kierunki, które zostały przyporządkowane na podstawie ankiety.</p>
+                <ul class="list-group">
+                    <li class="list-group-item" th:if="${not #lists.isEmpty(user.getSpecializations())}" th:text="${user.getSpecializations()[0].name}">1</li>
+                    <li class="list-group-item" th:if="${not #lists.isEmpty(user.getSpecializations())}" th:text="${user.getSpecializations()[1].name}">1</li>
+                    <li class="list-group-item" th:if="${not #lists.isEmpty(user.getSpecializations())}" th:text="${user.getSpecializations()[2].name}">1</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="alert alert-info" role="alert" th:if="${user.didSurvey()}">
+                <p>
+                    <strong>Pamiętaj!</strong> Zawsze możesz edytować swoje odpowiedzi.
+                </p>
+                <a class="btn btn-outline-primary" th:href="@{/user/survey}" role="button">Edytuj</a>
+            </div>
+            <h4>Twoje dane</h4>
+            <table class="table table-sm">
+                <tbody>
+                    <tr>
+                        <td><code class="highlighter-rouge">Id</code></td>
+                        <td th:text="${user.id}">1</td>
+                    </tr>
+                    <tr>
+                        <td><code class="highlighter-rouge">Imię</code></td>
+                        <td th:text="${user.name}">1</td>
+                    </tr>
+                    <tr>
+                        <td><code class="highlighter-rouge">Nazwisko</code></td>
+                        <td th:text="${user.lastName}">1</td>
+                    </tr>
+                    <tr>
+                        <td><code class="highlighter-rouge">Email</code></td>
+                        <td th:text="${user.email}">1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+</body>
+
+</html>
