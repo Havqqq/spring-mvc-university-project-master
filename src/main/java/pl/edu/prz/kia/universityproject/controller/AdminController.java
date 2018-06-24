@@ -156,12 +156,13 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView();
         List <Specialization> specializations = specializationService.findAll();
         List<Faculty> faculties = facultyService.findAll();
-        if(specialization.getId() > specializations.size()){
+        if(specialization.getId() > specializations.size()) {
             bindingResult.rejectValue("id", "error.id","Nie ma specjalizacji o takim ID!");
         }
         else if(specialization.getFaculty().getId() > faculties.size()){
             bindingResult.rejectValue("faculty", "error.faculty.id","Nie ma wydziału o takim ID!");
         }
+
 
 
         //System.out.println(specialization.getFaculty().getId());
@@ -182,6 +183,7 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView();
         List <Specialization> specializations = specializationService.findAll();
         List<Faculty> faculties = facultyService.findAll();
+//        Faculty facultyExists = new
         if(faculty.getId() > faculties.size()){
             bindingResult.rejectValue("id", "error.id","Nie ma wydziału o takim ID!");
         }
