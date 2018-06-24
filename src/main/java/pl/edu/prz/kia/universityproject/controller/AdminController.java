@@ -2,6 +2,7 @@ package pl.edu.prz.kia.universityproject.controller;
 
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -156,13 +157,15 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView();
         List <Specialization> specializations = specializationService.findAll();
         List<Faculty> faculties = facultyService.findAll();
-        if(specialization.getId() > specializations.size()) {
-            bindingResult.rejectValue("id", "error.id","Nie ma specjalizacji o takim ID!");
+        Specialization specializationExists = specializationService.findSpecializationById(specialization.getId());
+        Faculty facultyExists = facultyService.findFacultyById(specialization.getFaculty().getId());
+
+        if(specializationExists==null || specialization.getId()> specializations.size()) {
+            bindingResult.rejectValue("id", "error.id","Nie ma kierunku o takim ID!");
         }
-        else if(specialization.getFaculty().getId() > faculties.size()){
+        else if(facultyExists==null || specialization.getFaculty().getId() >faculties.size()){
             bindingResult.rejectValue("faculty", "error.faculty.id","Nie ma wydziału o takim ID!");
         }
-
 
 
         //System.out.println(specialization.getFaculty().getId());
@@ -183,14 +186,12 @@ public class AdminController {
         ModelAndView modelAndView = new ModelAndView();
         List <Specialization> specializations = specializationService.findAll();
         List<Faculty> faculties = facultyService.findAll();
-//        Faculty facultyExists = new
-        if(faculty.getId() > faculties.size()){
+        Faculty facultyExists = facultyService.findFacultyById(faculty.getId());
+        if(facultyExists == null){// || faculty.getId()> faculties.size() || faculty.getId() == null){
             bindingResult.rejectValue("id", "error.id","Nie ma wydziału o takim ID!");
         }
 
 
-        //System.out.println(specialization.getFaculty().getId());
-    //    System.out.println(faculties.size());
         if (bindingResult.hasErrors()){
             modelAndView.setViewName("/admin/facultiesEdit");
         }        else        {
@@ -201,4 +202,21 @@ public class AdminController {
         }
         return modelAndView;
     }
+
+    @RestController
+    public class IndexController implements ErrorController {
+
+        private static final String PATH = "/error";
+
+        @RequestMapping(value = PATH)
+        public String error() {
+            return "Ups... coś poszło nie tak! Prawdopodobnie są to błędnie wprowadzone dane!";
+        }
+
+        @Override
+        public String getErrorPath() {
+            return PATH;
+        }
+    }
+
 }
