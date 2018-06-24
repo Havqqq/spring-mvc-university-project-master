@@ -37,7 +37,8 @@ public class AdminController {
 
     private UserService userService;
     private RoleService roleService;
-    private UserAnswerService userAnswerService;private Object facultiesPost;
+    private UserAnswerService userAnswerService;
+    private Object facultiesPost;
 
     @Autowired
     public AdminController(UserService userService) {
@@ -108,6 +109,21 @@ public class AdminController {
         return modelAndView;
     }
 
+    @GetMapping(value="/admin/facultiesEdit")
+    public ModelAndView adminFacultiesEdit(){
+        ModelAndView modelAndView = new ModelAndView();
+        List<Faculty> faculties = facultyService.findAll();
+        List <Specialization> specializations = specializationService.findAll();
+        Specialization specialization = new Specialization();
+        Faculty faculty = new Faculty();
+        modelAndView.addObject("faculties", faculties);
+        modelAndView.addObject("faculty", faculty);
+        modelAndView.addObject("specializations", specializations);
+        modelAndView.addObject("specialization", specialization);
+        modelAndView.setViewName("admin/facultiesEdit");
+        return modelAndView;
+    }
+
     @GetMapping(value="/admin/facultiesAdd")
     public ModelAndView adminFacultiesAdd(){
         ModelAndView modelAndView = new ModelAndView();
@@ -148,13 +164,36 @@ public class AdminController {
         }
 
 
-System.out.println(specialization.getFaculty().getId());
-        System.out.println(faculties.size());
+        //System.out.println(specialization.getFaculty().getId());
+       System.out.println(faculties.size());
         if (bindingResult.hasErrors()){
             modelAndView.setViewName("/admin/facultiesSpecializationsEdit");
         }        else        {
             specializationService.updateSpecialization(specialization);
             modelAndView.addObject("specialization", specialization);
+            modelAndView.addObject("faculties", faculties);
+            modelAndView.setViewName("redirect:facultiesSpecializationsList");
+        }
+        return modelAndView;
+    }
+
+    @PostMapping(value="/admin/facultiesEdit")
+    public ModelAndView facultyUpdate(@Valid Faculty faculty, BindingResult bindingResult) {
+        ModelAndView modelAndView = new ModelAndView();
+        List <Specialization> specializations = specializationService.findAll();
+        List<Faculty> faculties = facultyService.findAll();
+        if(faculty.getId() > faculties.size()){
+            bindingResult.rejectValue("id", "error.id","Nie ma wydziału o takim ID!");
+        }
+
+
+        //System.out.println(specialization.getFaculty().getId());
+    //    System.out.println(faculties.size());
+        if (bindingResult.hasErrors()){
+            modelAndView.setViewName("/admin/facultiesEdit");
+        }        else        {
+            facultyService.updateFaculty(faculty);
+            modelAndView.addObject("faculty", faculty);
             modelAndView.addObject("faculties", faculties);
             modelAndView.setViewName("redirect:facultiesSpecializationsList");
         }
